@@ -68,8 +68,6 @@ jobs:
       fetch-depth: 0
       ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
       script: |
-        # The generic Linux job chooses to use base env, not the one setup by the image
-
         # Ensure no non-breaking spaces
         # NB: We use 'printf' below rather than '\u000a' since bash pre-4.2
         # does not support the '\u000a' syntax (which is relevant for local linters)
@@ -124,8 +122,6 @@ jobs:
       submodules: true
       ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
       script: |
-        # The generic Linux job chooses to use base env, not the one setup by the image
-
         # Regenerate workflows
         .github/scripts/generate_ci_workflows.py
 
@@ -159,8 +155,6 @@ jobs:
       fetch-depth: 0
       ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
       script: |
-        # The generic Linux job chooses to use base env, not the one setup by the image
-
         # Regenerate ToCs and check that they didn't change
         set -eu
 
@@ -197,8 +191,6 @@ jobs:
       fetch-depth: 0
       ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
       script: |
-        # The generic Linux job chooses to use base env, not the one setup by the image
-
         # Test tools
         PYTHONPATH=$(pwd) pytest tools/stats
         PYTHONPATH=$(pwd) pytest tools/test -o "python_files=test*.py"

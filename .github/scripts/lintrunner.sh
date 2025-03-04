@@ -18,7 +18,7 @@ if ! command -v lintrunner &> /dev/null; then
 fi
 
 # This has already been cached in the docker image
-lintrunner init
+lintrunner init 2> /dev/null
 
 # Do build steps necessary for linters
 if [[ "${CLANG}" == "1" ]]; then

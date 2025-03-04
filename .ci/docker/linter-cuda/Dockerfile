@@ -18,10 +18,10 @@ COPY ./common/install_user.sh install_user.sh
 RUN bash ./install_user.sh && rm install_user.sh
 
 # Install conda and other packages (e.g., numpy, pytest)
-ARG ANACONDA_PYTHON_VERSION
-ENV PYTHON_VERSION=$ANACONDA_PYTHON_VERSION
-ENV PATH /var/lib/jenkins/lint/bin:$PATH
-ENV VIRTUAL_ENV /var/lib/jenkins/lint
+ARG PYTHON_VERSION
+# Put venv into the env vars so users don't need to activate it
+ENV PATH /var/lib/jenkins/ci_env/bin:$PATH
+ENV VIRTUAL_ENV /var/lib/jenkins/ci_env
 COPY requirements-ci.txt /opt/requirements-ci.txt
 COPY ./common/install_python.sh install_python.sh
 RUN bash ./install_python.sh && rm install_python.sh /opt/requirements-ci.txt
@@ -38,7 +38,7 @@ COPY ./common/install_linter.sh install_linter.sh
 RUN bash ./install_linter.sh
 RUN rm install_linter.sh
 
-RUN chown -R jenkins:jenkins /var/lib/jenkins/lint
+RUN chown -R jenkins:jenkins /var/lib/jenkins/ci_env
 
 USER jenkins
 CMD ["bash"]
