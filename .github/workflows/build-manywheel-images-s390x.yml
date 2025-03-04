@@ -1,7 +1,7 @@
 name: Build manywheel docker images for s390x
 
 on:
-  # workflow_dispatch:
+  workflow_dispatch:
   # push:
   #   branches:
   #     - main
