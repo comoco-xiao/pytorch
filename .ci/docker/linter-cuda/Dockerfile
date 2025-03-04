@@ -20,7 +20,6 @@ RUN bash ./install_user.sh && rm install_user.sh
 # Install conda and other packages (e.g., numpy, pytest)
 ARG PYTHON_VERSION
 ARG PIP_CMAKE
-ENV PYTHON_VERSION=$PYTHON_VERSION
 # Put venv into the env vars so users don't need to activate it
 ENV PATH /var/lib/jenkins/ci_env/bin:$PATH
 ENV VIRTUAL_ENV /var/lib/jenkins/ci_env
