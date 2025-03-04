@@ -2798,9 +2798,7 @@ class View(GenericView):
                 # TODO: unbacked should not diverge from backed in determining striding
                 # Need to require contiguous here instead of realize, see:
                 # https://github.com/pytorch/pytorch/issues/145561
-                x = ExternKernel.require_exact_strides(
-                    x, FlexibleLayout.contiguous_strides(x.get_size())
-                )
+                x = ExternKernel.require_contiguous(x)
 
             storage, old_layout = as_storage_and_layout(x, want_contiguous=True)
             new_layout = FixedLayout(
@@ -5365,7 +5363,10 @@ class ExternKernel(InputsKernel):
 
     @classmethod
     def require_contiguous(cls, x):  # type: ignore[no-untyped-def]
-        return cls.require_exact_strides(x, FlexibleLayout.contiguous_strides(x.get_size()))
+        if x.get_name() in V.graph.constants and V.graph.constants[x.get_name()].is_mkldnn:
+            return x
+        else:
+            return cls.require_exact_strides(x, FlexibleLayout.contiguous_strides(x.get_size()))
 
     def apply_constraint(self) -> None:
         pass

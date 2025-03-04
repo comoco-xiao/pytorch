@@ -833,7 +833,6 @@ class LinearUnary(ExternKernelAlloc):
     def create(cls, x, w, B, attr, scalars, algorithm):
         x = cls.require_contiguous(cls.realize_input(x))
         w = cls.require_contiguous(cls.realize_input(w))
-
         *m, _ic = x.get_size()
         oc, _ic = w.get_size()
         output_size = list(m) + [oc]
