@@ -1,19 +1,8 @@
 #!/usr/bin/env bash
 set -ex
 
-python3 --version
-python --version
-pip --version
-pip3 --version
-python -m pip --version
-python3 -m pip --version
-
 # Use uv to speed up lintrunner init
 python3 -m pip install uv==0.1.45
-
-# Create a venv since uv does not work with --user
-python -m venv ${HOME}/lint --system-site-packages
-source ${HOME}/lint/bin/activate
 
 CACHE_DIRECTORY="/tmp/.lintbin"
 # Try to recover the cached binaries
