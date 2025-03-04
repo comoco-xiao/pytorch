@@ -1219,6 +1219,7 @@ class CompilationMetrics:
     guard_latency_us: Optional[float] = None
     recompile_reason: Optional[str] = None
     num_graph_breaks: Optional[int] = None
+    ir_count: Optional[int] = None
 
     @classmethod
     def create(cls, metrics: dict[str, Any]):
@@ -1469,6 +1470,7 @@ def record_compilation_metrics(
         "triton_version": triton.__version__ if has_triton() else "",
         "remote_cache_version": remote_cache_version,
         "inductor_fx_remote_cache_backend_type": inductor_fx_remote_cache_backend_type,
+        "ir_count": counters["dynamo_step_count"]["total"],
     }
 
     compilation_metrics = CompilationMetrics.create({**common_metrics, **metrics})
