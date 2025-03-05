@@ -85,6 +85,7 @@ from .exc import (
     ArgsMismatchError,
     BackendCompilerFailed,
     format_graph_break_message,
+    get_stack_above_dynamo,
     unimplemented_v2,
     Unsupported,
 )
@@ -489,7 +490,6 @@ def log_graph_break(code_options, reason="", exc_info=False, user_stack=None):
     if user_stack is None:
         user_stack = torch._guards.TracingContext.extract_stack()
 
-    # TODO: Also report the traceback from the parent frame
     try:
         frame_loc = (user_stack[-1].filename, user_stack[-1].lineno)
     except IndexError:
@@ -499,15 +499,16 @@ def log_graph_break(code_options, reason="", exc_info=False, user_stack=None):
             code_options["co_firstlineno"],
         )
 
+    stack_above_dynamo_formatted = "".join(
+        traceback.format_list(get_stack_above_dynamo())
+    )
     user_stack_formatted = "".join(traceback.format_list(user_stack))
     user_stack_trace = (
-        "Graph break in user code at %s:%s\nGraph Break Reason: %s\nUser code traceback:\n%s"  # noqa: UP031
-        % (
-            frame_loc[0],
-            frame_loc[1],
-            reason,
-            user_stack_formatted,
-        )
+        f"Graph break in user code at {frame_loc[0]}:{frame_loc[1]}\n"
+        f"Graph Break Reason: {reason}\n"
+        f"User code traceback:\n{stack_above_dynamo_formatted}\n"
+        "========== `torch.compile` tracing started here ==========\n\n"
+        f"{user_stack_formatted}"
     )
     torch._logging.trace_structured(
         "artifact",
@@ -602,9 +603,9 @@ def generic_jump(truth_fn: typing.Callable[[object], bool], push: bool):
             # 3.13 requires stack[-1] to be bool type
             self.output.add_output_instructions([create_instruction("TO_BOOL")])
 
-        self.output.add_output_instructions(
-            [create_instruction(inst.opname, target=if_jump[0])] + if_next + if_jump
-        )
+        jump_inst = create_instruction(inst.opname, target=if_jump[0])
+        jump_inst.copy_positions(inst)
+        self.output.add_output_instructions([jump_inst] + if_next + if_jump)
 
     def inner(self: "InstructionTranslatorBase", inst: Instruction):
         value: VariableTracker = self.pop()
@@ -872,9 +873,9 @@ def break_graph_if_unsupported(*, push):
                     self.output.add_output_instructions(
                         [create_instruction("KW_NAMES", argval=kw_names)]
                     )
-                self.output.add_output_instructions(
-                    create_call_function(inst.arg, False)
-                )
+                call_insts = create_call_function(inst.arg, False)
+                call_insts[-1].copy_positions(inst)
+                self.output.add_output_instructions(call_insts)
             else:
                 # copy instruction, but without exception table data
                 assert inst.target is None
