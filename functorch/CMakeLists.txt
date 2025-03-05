@@ -22,7 +22,8 @@ else()
   # functorch cannot use the alias to build on windows
   target_link_libraries(${PROJECT_NAME} PRIVATE torch torch_python)
 endif()
-target_link_libraries(${PROJECT_NAME} PRIVATE pybind::pybind11)
+# todo xiao
+# target_link_libraries(${PROJECT_NAME} PRIVATE pybind::pybind11)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY
       ${CMAKE_BINARY_DIR}/functorch)

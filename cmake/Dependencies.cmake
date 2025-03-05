@@ -848,7 +848,9 @@ if(BUILD_PYTHON)
   if(USE_NUMPY)
     list(APPEND PYTHON_COMPONENTS NumPy)
   endif()
-  find_package(Python COMPONENTS Interpreter OPTIONAL_COMPONENTS ${PYTHON_COMPONENTS})
+  # todo xiao
+  # find_package(Python COMPONENTS Interpreter OPTIONAL_COMPONENTS ${PYTHON_COMPONENTS})
+  find_package(Python COMPONENTS Interpreter OPTIONAL_COMPONENTS Development ${PYTHON_COMPONENTS})
 else()
   find_package(Python COMPONENTS Interpreter)
 endif()
@@ -863,7 +865,11 @@ if(${Python_VERSION} VERSION_LESS 3.8)
 endif()
 
 # ---[ Python + Numpy
+message(+++++++++++++++++++++++++++++++++++++++++++Dependencies---1---BUILD_PYTHON = ${BUILD_PYTHON})
+message(STATUS "NumPy 头文件目录: ${Python_NumPy_INCLUDE_DIRS}")
 if(BUILD_PYTHON)
+  message(STATUS "Python_Development.Module_FOUND状态: ${Python_Development.Module_FOUND}")
+  message(STATUS "Python_NumPy_FOUND状态: ${Python_NumPy_FOUND}")
   if(Python_Development.Module_FOUND)
     if(USE_NUMPY)
       if(NOT Python_NumPy_FOUND)
@@ -880,6 +886,7 @@ if(BUILD_PYTHON)
     caffe2_update_option(BUILD_PYTHON OFF)
   endif()
 endif()
+message(+++++++++++++++++++++++++++++++++++++++++++Dependencies---2---BUILD_PYTHON = ${BUILD_PYTHON})
 
 # ---[ pybind11
 if(USE_SYSTEM_PYBIND11)
@@ -898,6 +905,7 @@ else()
             FILES_MATCHING PATTERN "*.h")
 endif()
 message(STATUS "pybind11 include dirs: " "${pybind11_INCLUDE_DIRS}")
+
 add_library(pybind::pybind11 INTERFACE IMPORTED)
 target_include_directories(pybind::pybind11 SYSTEM INTERFACE ${pybind11_INCLUDE_DIRS})
 target_link_libraries(pybind::pybind11 INTERFACE Python::Module)
@@ -1290,7 +1298,9 @@ if(CAFFE2_CMAKE_BUILDING_WITH_MAIN_REPO AND NOT INTERN_DISABLE_ONNX)
     # In mobile build we care about code size, and so we need drop
     # everything (e.g. checker) in onnx but the pb definition.
     if(ANDROID OR IOS)
-      caffe2_interface_library(onnx_proto onnx_library)
+      # todo xiao
+      # caffe2_interface_library(onnx_proto onnx_library)
+      caffe2_interface_library(onnx onnx_library)  # Chaquopy: `onnx` was `onnx_proto`.
     else()
       caffe2_interface_library(onnx onnx_library)
     endif()
@@ -1497,7 +1507,9 @@ if(NOT INTERN_BUILD_MOBILE)
       add_definitions(-DHAVE_MMAP=1)
     endif(HAVE_MMAP)
     # done for lseek: https://www.gnu.org/software/libc/manual/html_node/File-Position-Primitive.html
-    add_definitions(-D_FILE_OFFSET_BITS=64)
+    # todo xiao
+    # Chaquopy: see https://android.googlesource.com/platform/bionic/+/master/docs/32-bit-abi.md
+    # add_definitions(-D_FILE_OFFSET_BITS=64)
     CHECK_FUNCTION_EXISTS(shm_open HAVE_SHM_OPEN)
     if(HAVE_SHM_OPEN)
       add_definitions(-DHAVE_SHM_OPEN=1)

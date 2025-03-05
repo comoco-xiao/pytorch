@@ -483,11 +483,13 @@ def build_deps():
     check_submodules()
     check_pydep("yaml", "pyyaml")
     build_python = not BUILD_LIBTORCH_WHL
+    print(f"++++++++++++++++++++++++++++++++++++---build_python = {build_python}")
+    print(f"++++++++++++++++++++++++++++++++++++---cmake_python_library = {cmake_python_library}")
     build_pytorch(
         version=version,
         cmake_python_library=cmake_python_library,
         build_python=build_python,
-        rerun_cmake=RERUN_CMAKE,
+        rerun_cmake=True,
         cmake_only=CMAKE_ONLY,
         cmake=cmake,
     )
@@ -1167,7 +1169,15 @@ def main():
         long_description = f.read()
 
     version_range_max = max(sys.version_info[1], 13) + 1
+    
+    # Chaquopy: see package_data below.
+    if os.path.exists("chaquopy"):
+        shutil.rmtree("chaquopy")
+    os.mkdir("chaquopy")
+    os.symlink("../torch/lib", "chaquopy/lib")
+    
     torch_package_data = [
+        'lib/libtorch_global_deps.so',  # Chaquopy: see comment at top of package_data.
         "py.typed",
         "bin/*",
         "test/*",
@@ -1416,6 +1426,9 @@ def main():
     ]
     package_data = {
         "torch": torch_package_data,
+        'chaquopy': [
+            'lib/*.so*'  # See exclude_package_data below.
+        ],
     }
 
     if not BUILD_LIBTORCH_WHL:
@@ -1435,7 +1448,7 @@ def main():
         long_description_content_type="text/markdown",
         ext_modules=extensions,
         cmdclass=cmdclass,
-        packages=packages,
+        packages=packages + ["chaquopy"],
         entry_points=entry_points,
         install_requires=install_requires,
         extras_require=extras_require,
@@ -1445,6 +1458,9 @@ def main():
         author="PyTorch Team",
         author_email="packages@pytorch.org",
         python_requires=f">={python_min_version_str}",
+        
+        exclude_package_data={'chaquopy': ['lib/libtorch_global_deps.so']},
+        
         # PyPI package information.
         classifiers=[
             "Development Status :: 5 - Production/Stable",

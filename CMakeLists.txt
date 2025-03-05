@@ -22,6 +22,35 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   message(FATAL_ERROR "In-source build are not supported")
 endif()
 
+# --------------------------------- chaquopy begin ------------------------------------
+set(BUILD_CUSTOM_PROTOBUF ON)
+# set(CMAKE_TOOLCHAIN_FILE "/home/ubuntu/workspace/android-sdk/ndk/21.4.7075529/build/cmake/android.toolchain.cmake")
+set(BUILD_TEST OFF)
+set(BUILD_BINARY OFF)
+set(BUILD_LITE_INTERPRETER OFF)
+set(TRACING_BASED OFF)
+set(USE_LIGHTWEIGHT_DISPATCH OFF)
+
+set(BUILD_MOBILE_BENCHMARK OFF)
+set(BUILD_MOBILE_TEST OFF)
+
+set(USE_CUDA OFF)
+
+set(USE_ITT OFF)
+set(USE_GFLAGS OFF)
+set(USE_OPENCV OFF)
+set(USE_MPI OFF)
+
+set(USE_OPENMP OFF)
+set(BUILD_PYTHON ON)
+
+# dependencies
+set(USE_NUMPY ON)
+set(USE_VULKAN OFF)
+# set(BUILD_MOBILE_AUTOGRAD ON)
+
+# --------------------------------- chaquopy end ------------------------------------
+
 # ---[ Project and semantic versioning.
 project(Torch CXX C)
 
@@ -663,7 +692,7 @@ string(APPEND CMAKE_CUDA_FLAGS " -Xfatbin -compress-all")
 if(ANDROID
    OR IOS
    OR DEFINED ENV{BUILD_PYTORCH_MOBILE_WITH_HOST_TOOLCHAIN})
-  set(INTERN_BUILD_MOBILE ON)
+  # set(INTERN_BUILD_MOBILE ON)
   message(WARNING "INTERN_BUILD_MOBILE is on, disabling BUILD_LAZY_TS_BACKEND")
   set(BUILD_LAZY_TS_BACKEND OFF)
 
@@ -715,10 +744,12 @@ if(INTERN_BUILD_MOBILE)
   else()
     set(INTERN_DISABLE_AUTOGRAD ON)
   endif()
-  set(BUILD_PYTHON OFF)
+  # todo xiao
+  # set(BUILD_PYTHON OFF)
   set(BUILD_FUNCTORCH OFF)
   set(USE_DISTRIBUTED OFF)
-  set(NO_API ON)
+  # todo xiao
+  # set(NO_API ON)
   set(USE_FBGEMM OFF)
   set(INTERN_DISABLE_ONNX ON)
   if(USE_BLAS)
@@ -854,6 +885,11 @@ endif()
 #
 # The only solution is to include(cmake/Dependencies.cmake), and defer the
 # aotriton build decision later.
+
+set(Python_LIBRARIES ${PYTHON_LIBRARIES} CACHE PATH "Python include directory" FORCE)
+set(Python_INCLUDE_DIRS ${PYTHON_INCLUDE_DIRS} CACHE FILEPATH "Python library" FORCE)
+message(---------------------------Python_LIBRARIES = ${Python_LIBRARIES})
+message(---------------------------Python_INCLUDE_DIRS = ${Python_INCLUDE_DIRS})
 
 include(cmake/Dependencies.cmake)
 
@@ -1354,6 +1390,12 @@ if(BUILD_JNI)
   set(FBJNI_SKIP_TESTS 1)
   add_subdirectory(android/pytorch_android)
 endif()
+
+# todo xiao
+# set(Python_LIBRARIES ${PYTHON_LIBRARIES})
+# set(Python_INCLUDE_DIRS ${PYTHON_INCLUDE_DIRS})
+# message(---------------------------Python_LIBRARIES = ${Python_LIBRARIES})
+# message(---------------------------Python_INCLUDE_DIRS = ${Python_INCLUDE_DIRS})
 
 include(cmake/Summary.cmake)
 caffe2_print_configuration_summary()

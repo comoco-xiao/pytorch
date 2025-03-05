@@ -433,6 +433,8 @@ __host__ __device__
 
 #if defined(__ANDROID__)
 #define C10_ANDROID 1
+// todo xiao
+// Chaquopy: this disables things required by the Python build.
 #define C10_MOBILE 1
 #elif (                   \
     defined(__APPLE__) && \

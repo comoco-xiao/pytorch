@@ -63,7 +63,9 @@ def prepare_multiprocessing_environment(path: str) -> None:
 
 
 def resolve_library_path(path: str) -> str:
-    return os.path.realpath(path)
+    # todo xiao
+    # return os.path.realpath(path)
+    return os.path.abspath(path)  # Chaquopy: was realpath. This patch is no longer necessary on newer versions of Chaquopy, which call realpath early in the importer.
 
 
 def throw_abstract_impl_not_imported_error(opname, module, context):

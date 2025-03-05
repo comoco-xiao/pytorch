@@ -305,11 +305,32 @@ class CMake:
             )
             sys.exit(1)
         build_options.update(cmake__options)
-
+        
+        # todo xiao
+        # Chaquopy: see https://github.com/shibatch/sleef/issues/249
+        # build_sleef_native = os.path.abspath("build-sleef-native")
+        # if not os.path.exists(build_sleef_native):  # For rerunning with build-wheel.py --no-unpack
+        #     os.mkdir(build_sleef_native)
+        #     sleef_env = os.environ.copy()
+        #     for name in ["AR", "ARFLAGS", "AS", "CC", "CFLAGS", "CPP", "CPPFLAGS", "CXX",
+        #                  "CXXFLAGS", "F77", "F90", "FARCH", "FC", "LD", "LDFLAGS", "LDSHARED",
+        #                  "NM", "RANLIB", "READELF", "STRIP"]:
+        #         sleef_env.pop(name, None)
+        #     kwargs = dict(cwd=build_sleef_native, env=sleef_env)
+        #     check_call(["cmake", "../third_party/sleef"], **kwargs)
+        #     check_call(["cmake", "--build", "." , "--", "-j", str(os.cpu_count())], **kwargs)
+        
+        # todo xiao
         CMake.defines(
             args,
-            Python_EXECUTABLE=sys.executable,
+            # Python_EXECUTABLE=sys.executable,
+            CAFFE2_CUSTOM_PROTOC_EXECUTABLE=which("protoc"),
+            ONNX_CUSTOM_PROTOC_EXECUTABLE=which("protoc"),
+            # BLAS="OpenBLAS",
+            # NATIVE_BUILD_DIR=build_sleef_native,
             TORCH_BUILD_VERSION=version,
+            # USE_CUDA="0",
+            # USE_VULKAN="0",  # Disable for now to simplify the build.
             **build_options,
         )
 

@@ -9,6 +9,7 @@ if(NOT CAFFE2_CMAKE_BUILDING_WITH_MAIN_REPO)
   set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 endif()
 
+message(+-+-+-+-+-+-+-+-+-+-+-+-+-+--+-+-+-+----------------BUILD_PYTHON = ${BUILD_PYTHON})
 if(NOT BUILD_PYTHON)
   return()
 endif()
@@ -70,6 +71,8 @@ set(TORCH_PYTHON_INCLUDE_DIRECTORIES
     ${TORCH_ROOT}/third_party/kineto/libkineto/include
     ${TORCH_ROOT}/third_party/cpp-httplib
     ${TORCH_ROOT}/third_party/nlohmann/include
+    # todo xiao
+    ${pybind11_INCLUDE_DIRS}
 
     ${TORCH_SRC_DIR}/csrc
     ${TORCH_SRC_DIR}/csrc/api/include
@@ -79,11 +82,12 @@ set(TORCH_PYTHON_INCLUDE_DIRECTORIES
 list(APPEND TORCH_PYTHON_INCLUDE_DIRECTORIES ${LIBSHM_SRCDIR})
 
 set(TORCH_PYTHON_LINK_LIBRARIES
-    Python::Module
-    pybind::pybind11
-    opentelemetry::api
-    httplib
-    nlohmann
+# todo xiao
+    # Python::Module
+    # pybind::pybind11
+    # opentelemetry::api
+    # httplib
+    # nlohmann
     shm
     fmt::fmt-header-only
     ATEN_CPU_FILES_GEN_LIB)
@@ -324,7 +328,8 @@ if(CAFFE2_USE_MKL AND BUILD_LIBTORCHLESS)
   target_link_libraries(torch_python PRIVATE caffe2::mkl)
 endif()
 
-add_dependencies(torch_python onnx_proto)
+# todo xiao
+# add_dependencies(torch_python onnx_proto)
 # Avoid numpy for the DEPLOY build
 if(USE_NUMPY)
   target_link_libraries(torch_python PRIVATE Python::NumPy)
@@ -482,19 +487,20 @@ add_dependencies(torch_python gen_torch_version)
 
 # Skip building this library under MacOS, since it is currently failing to build on Mac
 # Github issue #61930
-if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  # Add Android Nnapi delegate library
-  add_library(nnapi_backend SHARED
-          ${TORCH_SRC_DIR}/csrc/jit/backends/nnapi/nnapi_backend_lib.cpp
-          ${TORCH_SRC_DIR}/csrc/jit/backends/nnapi/nnapi_backend_preprocess.cpp
-          )
-  # Pybind11 requires explicit linking of the torch_python library
-  if(BUILD_LIBTORCHLESS)
-    target_link_libraries(nnapi_backend PRIVATE ${TORCH_LIB} torch_python pybind::pybind11)
-  else()
-    target_link_libraries(nnapi_backend PRIVATE torch torch_python pybind::pybind11)
-  endif()
-endif()
+# todo xiao
+# if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+#   # Add Android Nnapi delegate library
+#   add_library(nnapi_backend SHARED
+#           ${TORCH_SRC_DIR}/csrc/jit/backends/nnapi/nnapi_backend_lib.cpp
+#           ${TORCH_SRC_DIR}/csrc/jit/backends/nnapi/nnapi_backend_preprocess.cpp
+#           )
+#   # Pybind11 requires explicit linking of the torch_python library
+#   if(BUILD_LIBTORCHLESS)
+#     target_link_libraries(nnapi_backend PRIVATE ${TORCH_LIB} torch_python pybind::pybind11)
+#   else()
+#     target_link_libraries(nnapi_backend PRIVATE torch torch_python pybind::pybind11)
+#   endif()
+# endif()
 
 set(TORCH_PYTHON_COMPILE_OPTIONS ${TORCH_PYTHON_COMPILE_OPTIONS} PARENT_SCOPE)
 set(TORCH_PYTHON_LINK_FLAGS ${TORCH_PYTHON_LINK_FLAGS} PARENT_SCOPE)

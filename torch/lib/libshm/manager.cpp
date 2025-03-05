@@ -70,7 +70,9 @@ void print_init_message(std::string_view message) {
 }
 
 bool object_exists(const char* name) {
-  int fd = shm_open(name, O_RDONLY, 0);
+  // todo xiao
+  // int fd = shm_open(name, O_RDONLY, 0);
+  int fd = -1;   // Chaquopy: removed shm_open, which isn't supported on Android.
   if (fd >= 0) {
     close(fd);
     return true;
@@ -180,7 +182,9 @@ int main(int argc, char* argv[]) {
 
   for (auto& obj_name : used_objects) {
     DEBUG("freeing %s", obj_name.c_str());
-    shm_unlink(obj_name.c_str());
+    // todo xiao
+    // shm_unlink(obj_name.c_str());
+    // Chaquopy: removed shm_unlink, which isn't supported on Android.
   }
 
   // Clean up file descriptors

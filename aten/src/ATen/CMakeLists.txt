@@ -397,7 +397,9 @@ if(UNIX)
     add_definitions(-DHAVE_MMAP=1)
   endif(HAVE_MMAP)
   # done for lseek: https://www.gnu.org/software/libc/manual/html_node/File-Position-Primitive.html
-  add_definitions(-D_FILE_OFFSET_BITS=64)
+  # todo xiao
+  # Chaquopy: see https://android.googlesource.com/platform/bionic/+/master/docs/32-bit-abi.md
+  # add_definitions(-D_FILE_OFFSET_BITS=64)
   CHECK_FUNCTION_EXISTS(shm_open HAVE_SHM_OPEN)
   if(HAVE_SHM_OPEN)
     add_definitions(-DHAVE_SHM_OPEN=1)
